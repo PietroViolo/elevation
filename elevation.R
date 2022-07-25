@@ -20,9 +20,9 @@ library(ggnewscale)
 
 # Sample 1000 points
 
-lon <- seq(from = -83.60, to = -29.30, by = 0.3)
+lon <- seq(from = -83.60, to = -29.30, by = 0.05)
 
-lat <- seq(from = -57.20, to = 13.20, by = 0.3)
+lat <- seq(from = -57.20, to = 13.20, by = 0.05)
 
 south_america <- expand.grid(lon, lat)
 
@@ -118,6 +118,91 @@ render_camera(fov = 80, zoom = 0.5, theta = 0, phi = 90)
 
 
 png("south_america_elevation.png", res = 300, width = 5000, height = 5000)
+
+render_snapshot()
+
+dev.off()
+
+
+
+
+
+#### For Europe #####
+
+
+lon <- seq(from = -25.38, to = 54.07, by = 0.1)
+
+lat <- seq(from = 35.14, to = 71.51, by = 0.1)
+
+western_europe <- expand.grid(lon, lat)
+
+colnames(western_europe) <- c("x", "y")
+
+projection <- "EPSG:4326"
+
+
+western_europe_elevation <- get_elev_point(
+  western_europe,
+  units = "meters",
+  src = c("aws"),
+  prj = projection,
+  z = 7)
+
+
+western_europe$elevation <- western_europe_elevation$elevation
+
+gradient <- c("#1d3557",
+              "#50877c",
+              "#aac58e",
+              "#cbb982",
+              "#e09a30",
+              "#f94144")
+
+breaks <- c(-100,0,200,500,1000,2000,3000,4000,5000)
+
+western_europe <- western_europe %>% mutate(elevation = ifelse(elevation < -100,-100,elevation))
+
+
+pp <- ggplot(western_europe,aes( x = x, y =y, fill = elevation)) +
+  geom_raster() +
+  scale_fill_gradientn(values = scales::rescale(c(
+    -100,0,
+    1,200,
+    201,500,
+    501,1000,
+    1001,2000,
+    2001, 3000,
+    3001, 4000,
+    4001, 5000)),
+    space = "Lab",
+    colors = gradient,
+    breaks = breaks,
+    limits = c(-100,5000)) +
+  theme(legend.position="right",
+        axis.line=element_blank(),
+        axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title=element_blank(),
+        plot.background = element_rect(fill = "#1d3557", color = NA),
+        panel.background = element_rect(fill = "#1d3557", color = NA), 
+        legend.background = element_rect(fill = "#1d3557", color = NA),
+        panel.border=element_blank(),
+        panel.grid=element_blank(),
+        plot.title = element_text(size= 18, hjust=0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
+        plot.subtitle = element_text(size= 10, hjust=0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
+        legend.key.size = unit(2,"cm"))
+
+
+plot_gg(pp, width = 15, height = 12, scale = 100, multicore = TRUE, windowsize = c(2500, 2000),
+        shadow_intensity = 0.1,
+        raytrace = TRUE)
+
+
+render_camera(fov = 80, zoom = 0.5, theta = 0, phi = 90)
+
+
+
+png("western_europe_elevation.png", res = 300, width = 2500, height = 2000)
 
 render_snapshot()
 
