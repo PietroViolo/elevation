@@ -130,9 +130,9 @@ dev.off()
 #### For Europe #####
 
 
-lon <- seq(from = -25.38, to = 54.07, by = 0.1)
+lon <- seq(from = -11.69, to = 41.92, by = 0.2)
 
-lat <- seq(from = 35.14, to = 71.51, by = 0.1)
+lat <- seq(from = 35.46, to = 71.58, by = 0.2)
 
 western_europe <- expand.grid(lon, lat)
 
@@ -158,26 +158,47 @@ gradient <- c("#1d3557",
               "#e09a30",
               "#f94144")
 
-breaks <- c(-100,0,200,500,1000,2000,3000,4000,5000)
 
-western_europe <- western_europe %>% mutate(elevation = ifelse(elevation < -100,-100,elevation))
+western_europe <- western_europe %>% mutate(elevation = ifelse(elevation < -500,-500,elevation))
+
+breaks <- c(-500,-100,-50,0,50,100,200,300,500,1000,1500,2000,2500,3000, 5000)
+
+
+
+
+
+gradient <- c("#03045E", #bleu
+              "#023E8A", #vert
+              "#3a5a40",
+              "#588157", #jaune
+              "#fff3b0",
+              "#a98467",
+              "#c32f27",
+              "#ffffff")
 
 
 pp <- ggplot(western_europe,aes( x = x, y =y, fill = elevation)) +
   geom_raster() +
   scale_fill_gradientn(values = scales::rescale(c(
-    -100,0,
-    1,200,
-    201,500,
-    501,1000,
-    1001,2000,
-    2001, 3000,
-    3001, 4000,
-    4001, 5000)),
+    -500,-101,
+    -100,-51,
+    -50, 0,
+    1, 50,
+    51, 100,
+    101, 200,
+    201,300,
+    301, 500,
+    501,750,
+    751, 1000,
+    1001,1500,
+    1501, 2000,
+    2001, 2500,
+    2501,3000,
+    3001, 4500)),
     space = "Lab",
     colors = gradient,
     breaks = breaks,
-    limits = c(-100,5000)) +
+    limits = c(-500,4500)) +
   theme(legend.position="right",
         axis.line=element_blank(),
         axis.text=element_blank(),
@@ -190,20 +211,27 @@ pp <- ggplot(western_europe,aes( x = x, y =y, fill = elevation)) +
         panel.grid=element_blank(),
         plot.title = element_text(size= 18, hjust=0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
         plot.subtitle = element_text(size= 10, hjust=0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
-        legend.key.size = unit(2,"cm"))
+        legend.key.size = unit(4,"cm"),
+        legend.text = element_text(color = "white"))
 
 
-plot_gg(pp, width = 15, height = 12, scale = 100, multicore = TRUE, windowsize = c(2500, 2000),
-        shadow_intensity = 0.1,
+plot_gg(pp, width = 18.75, height = 15, scale = 150, multicore = TRUE, windowsize = c(2300, 3000),
+        shadow_intensity = 0.15,
         raytrace = TRUE)
+
+
+
 
 
 render_camera(fov = 80, zoom = 0.5, theta = 0, phi = 90)
 
 
 
-png("western_europe_elevation.png", res = 300, width = 2500, height = 2000)
+png("western_europe_elevation.png", res = 400, width = 3000, height = 2000)
 
 render_snapshot()
 
 dev.off()
+
+
+
